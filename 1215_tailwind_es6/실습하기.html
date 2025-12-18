@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>구매 수량 예제</title>
+  <style>
+    /* 전체 행 정렬 */
+    .select-row {
+      float: left;
+      width: 120px;
+      font-weight: bold;
+    }
+
+    /* 오른쪽 영역 */
+    .box {
+      margin-left: 140px;
+    }
+
+    .qty-box {
+      display: flex;
+      /* 핵심 */
+      align-items: center;
+      width: fit-content;
+      /* ⭐ 핵심 */
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 8px;
+      /* 위 요소와 간격 */
+    }
+
+    .qty-box button {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #f5f5f5;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .qty-box input {
+      width: 40px;
+      height: 32px;
+      border: none;
+      text-align: center;
+      background: #fff;
+    }
+
+    /* 하단 버튼 영역 */
+    .action-box {
+      clear: both;
+      /* ⭐ 핵심 */
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+
+    .icon-btn {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .icon-btn.active {
+      border-color: #570e79;
+      color: #570e79;
+    }
+
+    .cart-btn {
+      width: 280px;
+      height: 50px;
+      background: #570e79;
+      color: #fff;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cart-btn:hover {
+      background: #570e79;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <p class="select-row">
+    <span class="label">구매 수량</span>
+  </p>
+
+  <div class="box">
+    <select id="qtySelect">
+      <option value="">상품을 선택해 주세요.</option>
+      <option value="1">유명산지 설향딸기 500g</option>
+      <option value="2">유명산지 설향딸기 500g (2개)</option>
+      <option value="3">유명산지 설향딸기 500g (3개)</option>
+    </select>
+
+    <p id="selectedProduct" style="display:none;">
+      <strong></strong>
+    </p>
+
+    <p class="qty-box">
+      <button id="minus">-</button>
+      <input type="text" id="qtyInput" value="0" readonly>
+      <button id="plus">+</button>
+    </p>
+
+    <p>
+      <strong id="total">0</strong> 원
+    </p>
+  </div>
+
+  <!-- 하단 버튼 -->
+  <div class="action-box">
+    <button class="icon-btn" id="wishBtn">♡</button>
+    <button class="icon-btn" id="alarmBtn">🔔</button>
+    <button class="cart-btn" id="cartBtn">장바구니 담기</button>
+  </div>
+
+  <script>
+    const price = 15900;
+
+    const qtySelect = document.getElementById('qtySelect');
+    const qtyInput = document.getElementById('qtyInput');
+    const total = document.getElementById('total');
+
+    /* 선택된 상품 출력 영역 (없으면 생성) */
+    let selectedProduct = document.getElementById('selectedProduct');
+    if (!selectedProduct) {
+      selectedProduct = document.createElement('p');
+      selectedProduct.id = 'selectedProduct';
+      selectedProduct.style.display = 'none';
+      selectedProduct.innerHTML = '선택 상품 : <strong></strong>';
+      document.querySelector('.box').insertBefore(selectedProduct, total.parentElement);
+    }
+    const selectedText = selectedProduct.querySelector('strong');
+
+    /* 총 금액 계산 */
+    const calcTotal = () => {
+      const qty = Number(qtyInput.value);
+      total.innerText = (qty * price).toLocaleString();
+    };
+
+    /* 옵션 선택 */
+    qtySelect.addEventListener('change', () => {
+      const { value, selectedIndex, options } = qtySelect;
+      const text = options[selectedIndex].text;
+
+      if (value !== '0') {
+        qtyInput.value = 1;
+        selectedText.textContent = text;   // 옵션 글씨 그대로 출력
+        selectedProduct.style.display = 'block';
+      } else {
+        qtyInput.value = 0;
+        selectedProduct.style.display = 'none';
+      }
+      calcTotal();
+    });
+
+    /* 수량 + */
+    document.getElementById('plus').addEventListener('click', () => {
+      if (qtySelect.value === '0') return;
+      qtyInput.value = Number(qtyInput.value) + 1;
+      calcTotal();
+    });
+
+    /* 수량 - */
+    document.getElementById('minus').addEventListener('click', () => {
+      if (qtyInput.value > 1) {
+        qtyInput.value = Number(qtyInput.value) - 1;
+        calcTotal();
+      }
+    });
+
+    /* 찜 버튼 */
+    document.getElementById('wishBtn').addEventListener('click', function () {
+      this.classList.toggle('active');
+      this.textContent = this.textContent === '♡' ? '♥' : '♡';
+    });
+
+    /* 알림 버튼 */
+    document.getElementById('alarmBtn').addEventListener('click', function () {
+      this.classList.toggle('active');
+      alert('입고 알림이 설정되었습니다.');
+    });
+
+    /* 장바구니 버튼 */
+    document.getElementById('cartBtn').addEventListener('click', () => {
+      if (qtyInput.value == 0) {
+        alert('수량을 선택해 주세요.');
+        return;
+      }
+      alert(`${selectedText.textContent} ${qtyInput.value}개가 장바구니에 담겼습니다.`);
+    });
+  </script>
+
+
+</body>
+
+</html>
